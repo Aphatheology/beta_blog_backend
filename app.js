@@ -16,6 +16,12 @@ require('./src/config/passport');
 
 app.use('/articles', articleRoutes);
 app.use('/users', userRoutes);
+app.get('/', (req, res) => {
+    res.send({message: "Welcome to Alabata's Blog"})
+})
+app.use('*', (req, res) => {
+    res.send({message: "Route Not found"})
+})
 
 module.exports = app;
 
