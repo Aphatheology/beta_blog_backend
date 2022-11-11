@@ -1,41 +1,31 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
+const httpStatus = require("http-status");
+const ApiError = require("../utils/ApiError");
+const User = require("../users/user.model");
 
-const User = require('../users/user.model');
+const auth = async (req, res, next) => {
+    let token;
 
-const protect = async (req, res, next) => {
-	let token;
+    if (
+        req.headers.authorization &&
+        req.headers.authorization.startsWith("Bearer")
+    ) {
+        token = req.headers.authorization.split(" ")[1];
+        console.log(true);
+    }
 
-	if (
-		req.headers.authorization &&
-		req.headers.authorization.startsWith('Bearer')
-	) {
-		token = req.headers.authorization.split(' ')[1];
-	}
+    try {
+        if (!token) {
+            throw new ApiError(httpStatus.UNAUTHORIZED, "Please authenticate");
+        }
 
-	try {
-		if (
-			!token &&
-			req.baseUrl === '/articles' &&
-			(req.method === 'GET' ||
-				req.method === 'DELETE' ||
-				req.method === 'PATCH' ||
-				req.method === 'POST')
-		) {
-			return next();
-		}
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-		const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-		req.user = await User.findById(decoded.id);
-
-		next();
-	} catch (error) {
-		console.log({ error });
-		return res.status(401).json({
-			success: false,
-			message: 'Not authorized to access this route',
-		});
-	}
+        req.user = await User.findById(decoded.id);
+        next();
+    } catch (error) {
+        next(error);
+    }
 };
 
-module.exports = protect;
+module.exports = auth;

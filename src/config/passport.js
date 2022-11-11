@@ -1,13 +1,14 @@
-const JwtStrategy = require('passport-jwt').Strategy;
-const ExtractJwt = require('passport-jwt').ExtractJwt;
+const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
 const passport = require('passport');
-
-var opts = {};
 const User = require('../users/user.model');
-opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-opts.secretOrKey = process.env.JWT_SECRET;
+
+const jwtOptions = {
+    secretOrKey: process.env.JWT_SECRET,
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  };
+
 passport.use(
-	new JwtStrategy(opts, function (jwt_payload, done) {
+	new JwtStrategy(jwtOptions, function (jwt_payload, done) {
 		User.findOne({ email: jwt_payload.email }, function (err, user) {
 			if (err) {
 				return done(err, false);
@@ -16,7 +17,6 @@ passport.use(
 				return done(null, user);
 			} else {
 				return done(null, false);
-				// or you could create a new account
 			}
 		});
 	})

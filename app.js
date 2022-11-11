@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const passport = require('passport');
-// const articleRoutes = require('./routes/articleRoutes');
+const articleRoutes = require('./src/articles/article.route');
 const userRoutes = require('./src/users/user.route');
 const protect = require('./src/middleware/auth');
 
@@ -14,7 +14,7 @@ app.use(passport.initialize());
 require('./src/config/passport');
 
 
-// app.use('/articles', protect, articleRoutes);
+app.use('/articles', articleRoutes);
 app.use('/users', userRoutes);
 
 module.exports = app;
