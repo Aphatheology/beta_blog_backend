@@ -11,7 +11,7 @@ const articleSchema = new mongoose.Schema(
             type: String,
         },
         author: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: String,
             ref: "User",
             required: true,
         },
@@ -20,11 +20,11 @@ const articleSchema = new mongoose.Schema(
             enum: ["draft", "published"],
             default: "draft",
         },
-        read_count: {
+        readCount: {
             type: Number,
             default: 0,
         },
-        reading_time: {
+        readingTime: {
             type: Number,
             default: 0,
         },
