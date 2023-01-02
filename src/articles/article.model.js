@@ -18,6 +18,7 @@ const articleSchema = new mongoose.Schema(
         state: {
             type: String,
             enum: ["draft", "published"],
+            required: true,
             default: "draft",
         },
         readCount: {

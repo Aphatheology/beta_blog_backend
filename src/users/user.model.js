@@ -28,6 +28,11 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        role: {
+            type: String,
+            default: 'user',
+            required: true,
+        },
         articles: [
             {
                 type: mongoose.Schema.Types.ObjectId,
