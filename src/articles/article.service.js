@@ -8,28 +8,42 @@ const isTitleTaken = async function (title) {
     return !!article;
 };
 
+const slugGenerator = title => {
+    return title
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, "-") // Replace spaces with -
+    .replace(/[^\w\-]+/g, "") // Remove all non-word chars
+    .replace(/\-\-+/g, "-") // Replace multiple - with single -
+    .replace(/^-+/, "") // Trim - from start of text
+    .replace(/-+$/, ""); // Trim from end of text
+}
+
 const calculateReadingTime = (lengthOfArticle) => {
-	const wordsPerMinute = 200;
+    console.log(lengthOfArticle)
+	const wordsPerMinute = 180;
 	const minutes = lengthOfArticle / wordsPerMinute;
 	const readTime = Math.ceil(minutes);
 	return readTime;
 };
 
 const getAllArticles = async () => {
-    const articles = await Articles.find();
+    const articles = await Articles.find({state: 'draft'});
 
     return articles;
 };
 
 const createArticle = async (user, articleBody) => {
     if (await isTitleTaken(articleBody.title)) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "Title already taken");
+        throw new ApiError(httpStatus.BAD_REQUEST, "Title too Generic");
     }
+
     const newArticle = {
         ...articleBody,
         author: user.username,
         state: "draft",
-        readingTime: calculateReadingTime(articleBody.body.length),
+        manualSlug: slugGenerator(articleBody.title),
+        readingTime: calculateReadingTime(articleBody.body.match(/(\w+)/g).length),
     };
     const article = await Articles.create(newArticle);
 
