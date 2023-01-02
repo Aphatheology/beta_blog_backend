@@ -14,6 +14,7 @@ router
         articleController.createArticle
     );
 router.route("/").get(articleController.getAllArticles);
+router.route("/:id").get(articleController.getArticleById);
 router.route("/:id").patch(protect, articleController.publishArticle);
 router.route("/:id").put(protect, articleController.updateArticle);
 router.route("/:id").delete(protect, articleController.deleteArticle);

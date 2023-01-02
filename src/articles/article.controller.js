@@ -12,6 +12,11 @@ const createArticle = catchAsync(async (req, res) => {
     res.status(httpStatus.CREATED).send(article);
 });
 
+const getArticleById = catchAsync(async (req, res) => {
+    const article = await articleService.getArticleById(req.params.id);
+    res.send(article);
+});
+
 const updateArticle = catchAsync(async (req, res) => {
     const article = await articleService.updateArticle(
         req.user,
@@ -22,7 +27,7 @@ const updateArticle = catchAsync(async (req, res) => {
 });
 
 const deleteArticle = catchAsync(async (req, res) => {
-    const article = await articleService.deleteArticle(req.user, req.params.id);
+    await articleService.deleteArticle(req.user, req.params.id);
     res.status(httpStatus.NO_CONTENT).send();
 });
 
@@ -38,6 +43,7 @@ const publishArticle = catchAsync(async (req, res) => {
 module.exports = {
     createArticle,
     getAllArticles,
+    getArticleById,
     updateArticle,
     publishArticle,
     deleteArticle,

@@ -11,7 +11,6 @@ const auth = async (req, res, next) => {
         req.headers.authorization.startsWith("Bearer")
     ) {
         token = req.headers.authorization.split(" ")[1];
-        console.log(true);
     }
 
     try {
