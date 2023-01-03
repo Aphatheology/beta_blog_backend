@@ -8,19 +8,7 @@ const isTitleTaken = async function (title) {
     return !!article;
 };
 
-const slugGenerator = title => {
-    return title
-    .toString()
-    .toLowerCase()
-    .replace(/\s+/g, "-") // Replace spaces with -
-    .replace(/[^\w\-]+/g, "") // Remove all non-word chars
-    .replace(/\-\-+/g, "-") // Replace multiple - with single -
-    .replace(/^-+/, "") // Trim - from start of text
-    .replace(/-+$/, ""); // Trim from end of text
-}
-
 const calculateReadingTime = (lengthOfArticle) => {
-    console.log(lengthOfArticle)
 	const wordsPerMinute = 180;
 	const minutes = lengthOfArticle / wordsPerMinute;
 	const readTime = Math.ceil(minutes);
@@ -42,7 +30,6 @@ const createArticle = async (user, articleBody) => {
         ...articleBody,
         author: user.username,
         state: "draft",
-        manualSlug: slugGenerator(articleBody.title),
         readingTime: calculateReadingTime(articleBody.body.match(/(\w+)/g).length),
     };
     const article = await Articles.create(newArticle);
@@ -83,11 +70,11 @@ const updateArticle = async (user, articleId, articleBody) => {
     if (user.username !== article.author) {
         throw new ApiError(
             httpStatus.FORBIDDEN,
-            "You are not authorize to update others article"
+            "You are not authorize"
         );
     }
 
-    articleBody.readingTime = calculateReadingTime(articleBody.body.length);
+    articleBody.readingTime = calculateReadingTime(articleBody.body.match(/(\w+)/g).length);
 
     article = await Articles.findByIdAndUpdate(articleId, articleBody, {
         new: true,

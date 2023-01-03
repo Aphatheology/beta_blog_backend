@@ -38,11 +38,6 @@ const articleSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        manualSlug: {
-            type: String,
-            unique: true,
-            required: true,
-        },
         slug: { 
             type: String, 
             slug: "title", 
