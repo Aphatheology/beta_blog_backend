@@ -1,27 +1,35 @@
 const express = require('express');
 const app = express();
-const morgan = require('morgan');
+const config = require('./src/config/config');
+const morgan = require('./src/config/morgan');
 const passport = require('passport');
-const articleRoutes = require('./src/articles/article.route');
-const userRoutes = require('./src/users/user.route');
-const protect = require('./src/middleware/auth');
+const { errorConverter, errorHandler } = require('./src/middleware/error');
+const articleRoute = require('./src/articles/article.route');
+const authRoute = require('./src/users/auth.route');
+const userRoute = require('./src/users/user.route');
+require('./src/config/passport');
 
 //middleware
-app.use(morgan('dev'));
+if (config.env !== 'test') {
+    app.use(morgan.successHandler);
+    app.use(morgan.errorHandler);
+  }
 app.use(express.json());
 app.use(passport.initialize());
 
-require('./src/config/passport');
-
-
-app.use('/articles', articleRoutes);
-app.use('/users', userRoutes);
+app.use('/articles', articleRoute);
+app.use('/auth', authRoute);
+app.use('/user', userRoute);
 app.get('/', (req, res) => {
-    res.send({message: "Welcome to Alabata's Blog"})
+    res.send({message: "Welcome to Trenches's Blog"})
 })
 app.use('*', (req, res) => {
     res.send({message: "Route Not found"})
 })
+
+app.use(errorConverter);
+
+app.use(errorHandler);
 
 module.exports = app;
 

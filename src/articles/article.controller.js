@@ -12,29 +12,29 @@ const createArticle = catchAsync(async (req, res) => {
     res.status(httpStatus.CREATED).send(article);
 });
 
-const getArticleById = catchAsync(async (req, res) => {
-    const article = await articleService.getArticleById(req.params.id);
+const getArticleBySlug = catchAsync(async (req, res) => {
+    const article = await articleService.getArticleBySlug(req.params.slug);
     res.send(article);
 });
 
-const updateArticle = catchAsync(async (req, res) => {
-    const article = await articleService.updateArticle(
+const updateArticleBySlug = catchAsync(async (req, res) => {
+    const article = await articleService.updateArticleBySlug(
         req.user,
-        req.params.id,
+        req.params.slug,
         req.body
     );
     res.send(article);
 });
 
 const deleteArticle = catchAsync(async (req, res) => {
-    await articleService.deleteArticle(req.user, req.params.id);
+    await articleService.deleteArticle(req.user, req.params.slug);
     res.status(httpStatus.NO_CONTENT).send();
 });
 
 const publishArticle = catchAsync(async (req, res) => {
     const article = await articleService.publishArticle(
         req.user,
-        req.params.id,
+        req.params.slug,
         req.body
     );
     res.send(article);
@@ -43,8 +43,8 @@ const publishArticle = catchAsync(async (req, res) => {
 module.exports = {
     createArticle,
     getAllArticles,
-    getArticleById,
-    updateArticle,
+    getArticleBySlug,
+    updateArticleBySlug,
     publishArticle,
     deleteArticle,
 };

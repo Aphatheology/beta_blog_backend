@@ -14,7 +14,31 @@ const login = catchAsync(async (req, res) => {
     res.send(user);
 });
 
+const createUser = catchAsync(async (req, res) => {
+    const user = await userService.createUser(req.user, req.body);
+    res.status(httpStatus.CREATED).send(user);
+});
+
+const getAllUsers = catchAsync(async (req, res) => {
+    const user = await userService.getAllUsers();
+    res.send(user);
+});
+
+const getUserByUsername = catchAsync(async (req, res) => {
+    const user = await userService.getUserByUsername(req.params.username);
+    res.send(user);
+});
+
+const updateUserByUsername = catchAsync(async (req, res) => {
+    const user = await userService.updateUserByUsername(req.params.username, req.body);
+    res.send(user);
+});
+
 module.exports = {
     register,
     login,
+    createUser,
+    getAllUsers,
+    getUserByUsername,
+    updateUserByUsername,
 };

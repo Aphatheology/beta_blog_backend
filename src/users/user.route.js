@@ -1,10 +1,18 @@
 const express = require('express');
 const validate = require('../middleware/validate');
+const protect = require("../middleware/auth");
 const router = express.Router();
 const userController = require('./user.controller');
 const userValidation = require('./user.validation')
 
-router.route('/register').post(validate(userValidation.register), userController.register);
-router.route('/login').post(validate(userValidation.login), userController.login);
+router
+  .route('/')
+  .post(validate(userValidation.createUser), userController.createUser)
+  .get(userController.getAllUsers);
+
+router
+  .route('/:username')
+  .get(validate(userValidation.getUser), userController.getUserByUsername)
+  .patch(validate(userValidation.updateUser), userController.updateUserByUsername);
 
 module.exports = router;

@@ -16,14 +16,14 @@ const calculateReadingTime = (lengthOfArticle) => {
 };
 
 const getAllArticles = async () => {
-    const articles = await Articles.find({state: 'draft'});
+    const articles = await Articles.find({state: 'published'});
 
     return articles;
 };
 
 const createArticle = async (user, articleBody) => {
     if (await isTitleTaken(articleBody.title)) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "Title too Generic");
+        throw new ApiError(httpStatus.BAD_REQUEST, "Title is taken");
     }
 
     const newArticle = {
@@ -37,31 +37,31 @@ const createArticle = async (user, articleBody) => {
     return article;
 };
 
-const getArticleById = async (articleId) => {
-    let article = await Articles.find({id: articleId, state: 'published'});
+const getArticleBySlug = async (slug) => {
+    let article = await Articles.find({slug, state: 'published'});
 
     if (article.length == 0) {
         throw new ApiError(httpStatus.NOT_FOUND, "Article not found");
     }
     
-    return updateArticleReadCount(articleId, article);
+    return updateArticleReadCount(slug, article);
 }
 
-const updateArticleReadCount = async (articleId, article) => {
+const updateArticleReadCount = async (slug, article) => {
 
-    const articleToUpdate = await Articles.findByIdAndUpdate(
-		articleId,
+    const articleToUpdate = await Articles.findOneAndUpdate(
+		{slug},
 		{
 			readCount: ++article[0].readCount,
 		},
-		{ new: true }
+		{returnDocument: 'after'}
 	)
 
     return articleToUpdate;
 }
 
-const updateArticle = async (user, articleId, articleBody) => {
-    let article = await Articles.findById(articleId);
+const updateArticleBySlug = async (user, slug, articleBody) => {
+    let article = await Articles.find({slug});
 
     if (!article) {
         throw new ApiError(httpStatus.NOT_FOUND, "Article not found");
@@ -70,22 +70,22 @@ const updateArticle = async (user, articleId, articleBody) => {
     if (user.username !== article.author) {
         throw new ApiError(
             httpStatus.FORBIDDEN,
-            "You are not authorize"
+            "You are not authorized"
         );
     }
 
     articleBody.readingTime = calculateReadingTime(articleBody.body.match(/(\w+)/g).length);
 
-    article = await Articles.findByIdAndUpdate(articleId, articleBody, {
-        new: true,
+    article = await Articles.findOneAndUpdate({slug}, articleBody, {
+        returnDocument: 'after',
         runValidators: true,
     });
 
     return article;
 };
 
-const publishArticle = async (user, articleId) => {
-    let article = await Articles.findById(articleId);
+const publishArticle = async (user, slug) => {
+    let article = await Articles.find({slug});
 
     if (!article) {
         throw new ApiError(httpStatus.NOT_FOUND, "Article not found");
@@ -94,21 +94,21 @@ const publishArticle = async (user, articleId) => {
     if (user.username !== article.author) {
         throw new ApiError(
             httpStatus.FORBIDDEN,
-            "You are not authorize to publish others article"
+            "You are not authorized"
         );
     }
 
-    article = await Articles.findByIdAndUpdate(
-        articleId,
+    article = await Articles.findOneAndUpdate(
+        {slug},
         { state: "published" },
-        { new: true }
+        { returnDocument: 'after' }
     );
 
     return article;
 };
 
-const deleteArticle = async (user, articleId) => {
-    const article = await Articles.findById(articleId);
+const deleteArticle = async (user, articleSlug) => {
+    const article = await Articles.find({slug});
 
     if (!article) {
         throw new ApiError(httpStatus.NOT_FOUND, "Article not found");
@@ -117,19 +117,19 @@ const deleteArticle = async (user, articleId) => {
     if (user.username !== article.author) {
         throw new ApiError(
             httpStatus.FORBIDDEN,
-            "You are not authorize to delete others article"
+            "You are not authorized"
         );
     }
 
-    await Articles.findByIdAndDelete(articleId);
+    await Articles.findOneAndDelete({slug});
     return;
 };
 
 module.exports = {
     createArticle,
     getAllArticles,
-    getArticleById,
-    updateArticle,
+    getArticleBySlug,
+    updateArticleBySlug,
     publishArticle,
     deleteArticle,
 };
