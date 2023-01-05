@@ -51,4 +51,15 @@ const articleSchema = new mongoose.Schema(
     { timeStamps: true }
 );
 
+// articleSchema.post("findOneAndUpdate", async function () {
+//     console.log('after saving')
+//     let docToUpdate = await this.model.findOne(this.getQuery());
+//     console.log(docToUpdate)
+//     const wordsPerMinute = 180;
+// 	const minutes = (docToUpdate.body.match(/(\w+)/g).length) / wordsPerMinute;
+// 	docToUpdate.readingTime = Math.ceil(minutes);
+//     // console.log(this.readingTime, minutes)
+//     this.set({ readingTime: Math.ceil(minutes) });
+// });
+
 module.exports = mongoose.model("Article", articleSchema);

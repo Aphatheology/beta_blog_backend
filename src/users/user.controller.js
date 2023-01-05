@@ -20,7 +20,7 @@ const createUser = catchAsync(async (req, res) => {
 });
 
 const getAllUsers = catchAsync(async (req, res) => {
-    const user = await userService.getAllUsers();
+    const user = await userService.getAllUsers(req.user);
     res.send(user);
 });
 
@@ -30,7 +30,7 @@ const getUserByUsername = catchAsync(async (req, res) => {
 });
 
 const updateUserByUsername = catchAsync(async (req, res) => {
-    const user = await userService.updateUserByUsername(req.params.username, req.body);
+    const user = await userService.updateUserByUsername(req.user, req.params.username, req.body);
     res.send(user);
 });
 

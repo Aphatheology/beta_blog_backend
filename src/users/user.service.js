@@ -54,7 +54,11 @@ const createUser = async (user, userBody) => {
     return newUser;
 };
 
-const getAllUsers = async () => {
+const getAllUsers = async (user) => {
+    if (user.role !== 'admin') {
+		throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized');
+	}
+
     const users = await Users.find();
 
     return users;
@@ -68,12 +72,17 @@ const getUserByUsername = async (username) => {
     return user;
 };
 
-const updateUserByUsername = async (username, userBody) => {
-    const userToUpdate = await Users.findOneAndUpdate({username: { '$regex': username, $options: 'i' }}, userBody, {returnDocument: 'after'});
-
-    if (userToUpdate === null) {
-        throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+const updateUserByUsername = async (user, username, userBody) => {
+    console.log(user)
+    let userToUpdate = await getUserByUsername(username);
+    console.log(userToUpdate)
+    if (user.username !== userToUpdate[0].username) {
+        throw new ApiError(
+            httpStatus.FORBIDDEN,
+            "You are not authorized"
+        );
     }
+    userToUpdate = await Users.findOneAndUpdate({username: { '$regex': username, $options: 'i' }}, userBody, {returnDocument: 'after'});
 
     return userToUpdate;
 };

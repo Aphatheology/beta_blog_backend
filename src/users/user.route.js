@@ -7,12 +7,12 @@ const userValidation = require('./user.validation')
 
 router
   .route('/')
-  .post(validate(userValidation.createUser), userController.createUser)
-  .get(userController.getAllUsers);
+  .post(protect, validate(userValidation.createUser), userController.createUser)
+  .get(protect, userController.getAllUsers);
 
 router
   .route('/:username')
   .get(validate(userValidation.getUser), userController.getUserByUsername)
-  .patch(validate(userValidation.updateUser), userController.updateUserByUsername);
+  .patch(protect, validate(userValidation.updateUser), userController.updateUserByUsername);
 
 module.exports = router;

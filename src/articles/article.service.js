@@ -38,9 +38,9 @@ const createArticle = async (user, articleBody) => {
 };
 
 const getArticleBySlug = async (slug) => {
-    let article = await Articles.find({slug, state: 'published'});
+    let article = await Articles.findOne({slug, state: 'published'});
 
-    if (article.length == 0) {
+    if (!article) {
         throw new ApiError(httpStatus.NOT_FOUND, "Article not found");
     }
     
@@ -52,7 +52,7 @@ const updateArticleReadCount = async (slug, article) => {
     const articleToUpdate = await Articles.findOneAndUpdate(
 		{slug},
 		{
-			readCount: ++article[0].readCount,
+			readCount: ++article.readCount,
 		},
 		{returnDocument: 'after'}
 	)
@@ -61,7 +61,7 @@ const updateArticleReadCount = async (slug, article) => {
 }
 
 const updateArticleBySlug = async (user, slug, articleBody) => {
-    let article = await Articles.find({slug});
+    let article = await Articles.findOne({slug});
 
     if (!article) {
         throw new ApiError(httpStatus.NOT_FOUND, "Article not found");
@@ -74,7 +74,9 @@ const updateArticleBySlug = async (user, slug, articleBody) => {
         );
     }
 
-    articleBody.readingTime = calculateReadingTime(articleBody.body.match(/(\w+)/g).length);
+    if(articleBody.body) {
+        articleBody.readingTime = calculateReadingTime(articleBody.body.match(/(\w+)/g).length);
+    }
 
     article = await Articles.findOneAndUpdate({slug}, articleBody, {
         returnDocument: 'after',
@@ -84,8 +86,8 @@ const updateArticleBySlug = async (user, slug, articleBody) => {
     return article;
 };
 
-const publishArticle = async (user, slug) => {
-    let article = await Articles.find({slug});
+const updateArticleState = async (user, slug, state) => {
+    let article = await Articles.findOne({slug});
 
     if (!article) {
         throw new ApiError(httpStatus.NOT_FOUND, "Article not found");
@@ -100,21 +102,21 @@ const publishArticle = async (user, slug) => {
 
     article = await Articles.findOneAndUpdate(
         {slug},
-        { state: "published" },
+        { state },
         { returnDocument: 'after' }
     );
 
     return article;
 };
 
-const deleteArticle = async (user, articleSlug) => {
-    const article = await Articles.find({slug});
+const deleteArticle = async (user, slug) => {
+    const article = await Articles.findOne({slug});
 
     if (!article) {
         throw new ApiError(httpStatus.NOT_FOUND, "Article not found");
     }
 
-    if (user.username !== article.author) {
+    if (user.username !== article.author && user.role !== 'admin') {
         throw new ApiError(
             httpStatus.FORBIDDEN,
             "You are not authorized"
@@ -130,6 +132,6 @@ module.exports = {
     getAllArticles,
     getArticleBySlug,
     updateArticleBySlug,
-    publishArticle,
+    updateArticleState,
     deleteArticle,
 };

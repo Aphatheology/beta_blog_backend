@@ -22,7 +22,7 @@ const createUser = {
     body: Joi.object().keys({
         email: Joi.string().required().email(),
         username: Joi.string().required(),
-        password: Joi.string().custom(password),
+        password: Joi.string().required().custom(password),
         firstname: Joi.string().required(),
         lastname: Joi.string().required(),
     }),

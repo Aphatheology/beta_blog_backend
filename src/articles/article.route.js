@@ -16,9 +16,16 @@ router
 
 router
     .route("/:slug")
-    .get(articleController.getArticleBySlug)
-    .patch(protect, articleController.publishArticle)
-    .put(protect, articleController.updateArticleBySlug)
-    .delete(protect, articleController.deleteArticle);
+    .get(validate(articleValidation.getArticleBySlug), articleController.getArticleBySlug)
+    .put(protect, validate(articleValidation.updateArticleBySlug), articleController.updateArticleBySlug)
+    .delete(protect, validate(articleValidation.deleteArticleBySlug), articleController.deleteArticle);
+
+router
+    .route("/:slug/:state")
+    .patch(
+        protect,
+        validate(articleValidation.updateArticleState),
+        articleController.updateArticleState
+    );
 
 module.exports = router;

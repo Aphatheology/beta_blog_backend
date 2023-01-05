@@ -31,11 +31,11 @@ const deleteArticle = catchAsync(async (req, res) => {
     res.status(httpStatus.NO_CONTENT).send();
 });
 
-const publishArticle = catchAsync(async (req, res) => {
-    const article = await articleService.publishArticle(
+const updateArticleState = catchAsync(async (req, res) => {
+    const article = await articleService.updateArticleState(
         req.user,
         req.params.slug,
-        req.body
+        req.params.state
     );
     res.send(article);
 });
@@ -45,6 +45,6 @@ module.exports = {
     getAllArticles,
     getArticleBySlug,
     updateArticleBySlug,
-    publishArticle,
+    updateArticleState,
     deleteArticle,
 };
