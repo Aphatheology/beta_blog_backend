@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const slug = require("mongoose-slug-generator");
 mongoose.plugin(slug);
+const paginate = require('../utils/paginate');
 
 const articleSchema = new mongoose.Schema(
     {
@@ -50,5 +51,7 @@ const articleSchema = new mongoose.Schema(
     },
     { timeStamps: true }
 );
+
+articleSchema.plugin(paginate);
 
 module.exports = mongoose.model("Article", articleSchema);

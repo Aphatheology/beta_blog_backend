@@ -17,7 +17,7 @@ router
 router
     .route("/:slug")
     .get(validate(articleValidation.getArticleBySlug), articleController.getArticleBySlug)
-    .put(protect, validate(articleValidation.updateArticleBySlug), articleController.updateArticleBySlug)
+    .patch(protect, validate(articleValidation.updateArticleBySlug), articleController.updateArticleBySlug)
     .delete(protect, validate(articleValidation.deleteArticleBySlug), articleController.deleteArticle);
 
 router

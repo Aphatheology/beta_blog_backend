@@ -9,14 +9,14 @@ const isTitleTaken = async function (title) {
 };
 
 const calculateReadingTime = (lengthOfArticle) => {
-	const wordsPerMinute = 180;
-	const minutes = lengthOfArticle / wordsPerMinute;
-	const readTime = Math.ceil(minutes);
-	return readTime;
+    const wordsPerMinute = 180;
+    const minutes = lengthOfArticle / wordsPerMinute;
+    const readTime = Math.ceil(minutes);
+    return readTime;
 };
 
-const getAllArticles = async () => {
-    const articles = await Articles.find({state: 'published'});
+const getAllArticles = async (filter, options) => {
+    const articles = await Articles.paginate(filter, options);
 
     return articles;
 };
@@ -30,7 +30,9 @@ const createArticle = async (user, articleBody) => {
         ...articleBody,
         author: user.username,
         state: "draft",
-        readingTime: calculateReadingTime(articleBody.body.match(/(\w+)/g).length),
+        readingTime: calculateReadingTime(
+            articleBody.body.match(/(\w+)/g).length
+        ),
     };
     const article = await Articles.create(newArticle);
 
@@ -38,48 +40,46 @@ const createArticle = async (user, articleBody) => {
 };
 
 const getArticleBySlug = async (slug) => {
-    let article = await Articles.findOne({slug, state: 'published'});
+    let article = await Articles.findOne({ slug, state: "published" });
 
     if (!article) {
         throw new ApiError(httpStatus.NOT_FOUND, "Article not found");
     }
-    
+
     return updateArticleReadCount(slug, article);
-}
+};
 
 const updateArticleReadCount = async (slug, article) => {
-
     const articleToUpdate = await Articles.findOneAndUpdate(
-		{slug},
-		{
-			readCount: ++article.readCount,
-		},
-		{returnDocument: 'after'}
-	)
+        { slug },
+        {
+            readCount: ++article.readCount,
+        },
+        { returnDocument: "after" }
+    );
 
     return articleToUpdate;
-}
+};
 
 const updateArticleBySlug = async (user, slug, articleBody) => {
-    let article = await Articles.findOne({slug});
+    let article = await Articles.findOne({ slug });
 
     if (!article) {
         throw new ApiError(httpStatus.NOT_FOUND, "Article not found");
     }
 
     if (user.username !== article.author) {
-        throw new ApiError(
-            httpStatus.FORBIDDEN,
-            "You are not authorized"
+        throw new ApiError(httpStatus.FORBIDDEN, "You are not authorized");
+    }
+
+    if (articleBody.body) {
+        articleBody.readingTime = calculateReadingTime(
+            articleBody.body.match(/(\w+)/g).length
         );
     }
 
-    if(articleBody.body) {
-        articleBody.readingTime = calculateReadingTime(articleBody.body.match(/(\w+)/g).length);
-    }
-
-    article = await Articles.findOneAndUpdate({slug}, articleBody, {
-        returnDocument: 'after',
+    article = await Articles.findOneAndUpdate({ slug }, articleBody, {
+        returnDocument: "after",
         runValidators: true,
     });
 
@@ -87,43 +87,37 @@ const updateArticleBySlug = async (user, slug, articleBody) => {
 };
 
 const updateArticleState = async (user, slug, state) => {
-    let article = await Articles.findOne({slug});
+    let article = await Articles.findOne({ slug });
 
     if (!article) {
         throw new ApiError(httpStatus.NOT_FOUND, "Article not found");
     }
 
     if (user.username !== article.author) {
-        throw new ApiError(
-            httpStatus.FORBIDDEN,
-            "You are not authorized"
-        );
+        throw new ApiError(httpStatus.FORBIDDEN, "You are not authorized");
     }
 
     article = await Articles.findOneAndUpdate(
-        {slug},
+        { slug },
         { state },
-        { returnDocument: 'after' }
+        { returnDocument: "after" }
     );
 
     return article;
 };
 
 const deleteArticle = async (user, slug) => {
-    const article = await Articles.findOne({slug});
+    const article = await Articles.findOne({ slug });
 
     if (!article) {
         throw new ApiError(httpStatus.NOT_FOUND, "Article not found");
     }
 
-    if (user.username !== article.author && user.role !== 'admin') {
-        throw new ApiError(
-            httpStatus.FORBIDDEN,
-            "You are not authorized"
-        );
+    if (user.username !== article.author && user.role !== "admin") {
+        throw new ApiError(httpStatus.FORBIDDEN, "You are not authorized");
     }
 
-    await Articles.findOneAndDelete({slug});
+    await Articles.findOneAndDelete({ slug });
     return;
 };
 
