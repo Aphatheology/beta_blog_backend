@@ -27,20 +27,28 @@ const register = async (userBody) => {
 };
 
 const login = async (userBody) => {
-    const user = await Users.findOne({ email: userBody.email }).select('+password');
+    const user = await Users.findOne({ email: userBody.email }).select(
+        "+password"
+    );
 
-	if (!user || !(await user.correctPassword(userBody.password, user.password))) {
-		throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
-	}
+    if (
+        !user ||
+        !(await user.correctPassword(userBody.password, user.password))
+    ) {
+        throw new ApiError(
+            httpStatus.UNAUTHORIZED,
+            "Incorrect email or password"
+        );
+    }
     const token = user.createJWT();
-    
+
     return { user, token };
 };
 
 const createUser = async (user, userBody) => {
-    if (user.role !== 'admin') {
-		throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized');
-	}
+    if (user.role !== "admin") {
+        throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized");
+    }
 
     if (await isEmailTaken(userBody.email)) {
         throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
@@ -54,18 +62,36 @@ const createUser = async (user, userBody) => {
     return newUser;
 };
 
-const getAllUsers = async (user) => {
-    if (user.role !== 'admin') {
-		throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized');
-	}
+const getAllUsers = async (user, filter, options) => {
+    // if (user.role !== 'admin') {
+    // 	throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized');
+    // }
 
-    const users = await Users.find();
+    const users = await Users.paginate(filter, options);
 
     return users;
 };
 
 const getUserByUsername = async (username) => {
-    const user = await Users.find({username: { '$regex': username, $options: 'i' }});
+    const user = await Users.find({
+        username: { $regex: username, $options: "i" },
+    }).populate('articles');
+    if (user.length == 0) {
+        throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+    }
+    return user;
+};
+
+const publicGetUserByUsername = async (username) => {
+    const user = await Users.find({
+        username: { $regex: username, $options: "i" },
+    })
+        .select("-password")
+        .select("-role")
+        .populate({
+            path: "articles",
+            match: { state: "published" },
+        });
     if (user.length == 0) {
         throw new ApiError(httpStatus.NOT_FOUND, "User not found");
     }
@@ -73,16 +99,17 @@ const getUserByUsername = async (username) => {
 };
 
 const updateUserByUsername = async (user, username, userBody) => {
-    console.log(user)
+    console.log(user);
     let userToUpdate = await getUserByUsername(username);
-    console.log(userToUpdate)
+    console.log(userToUpdate);
     if (user.username !== userToUpdate[0].username) {
-        throw new ApiError(
-            httpStatus.FORBIDDEN,
-            "You are not authorized"
-        );
+        throw new ApiError(httpStatus.FORBIDDEN, "You are not authorized");
     }
-    userToUpdate = await Users.findOneAndUpdate({username: { '$regex': username, $options: 'i' }}, userBody, {returnDocument: 'after'});
+    userToUpdate = await Users.findOneAndUpdate(
+        { username: { $regex: username, $options: "i" } },
+        userBody,
+        { returnDocument: "after" }
+    );
 
     return userToUpdate;
 };
@@ -93,6 +120,6 @@ module.exports = {
     createUser,
     getAllUsers,
     getUserByUsername,
+    publicGetUserByUsername,
     updateUserByUsername,
-    
 };

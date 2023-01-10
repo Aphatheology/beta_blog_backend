@@ -28,14 +28,18 @@ const createArticle = async (user, articleBody) => {
 
     const newArticle = {
         ...articleBody,
-        author: user.username,
+        author: user._id,
         state: "draft",
         readingTime: calculateReadingTime(
             articleBody.body.match(/(\w+)/g).length
         ),
     };
     const article = await Articles.create(newArticle);
+    
+    const { _id } = article._doc;
 
+    const newUser = await userModel.findByIdAndUpdate(user._id, {$push: {articles: _id}})
+    console.log(newUser)
     return article;
 };
 

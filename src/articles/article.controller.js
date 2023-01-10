@@ -5,7 +5,7 @@ const catchAsync = require("../utils/catchAsync");
 
 const getAllArticles = catchAsync(async (req, res) => {
     const filter = pick(req.query, ["state", "author"]);
-    const options = pick(req.query, ["sortBy", "limit", "page"]);
+    const options = pick(req.query, ["sortBy", "limit", "page", "authorMain"]);
     const articles = await articleService.getAllArticles(filter, options);
     res.send(articles);
 });

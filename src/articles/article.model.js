@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const slug = require("mongoose-slug-generator");
 mongoose.plugin(slug);
-const paginate = require('../utils/paginate');
+const paginate = require("../utils/paginate");
 
 const articleSchema = new mongoose.Schema(
     {
@@ -14,9 +14,8 @@ const articleSchema = new mongoose.Schema(
             type: String,
         },
         author: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true,
         },
         state: {
             type: String,
@@ -39,10 +38,10 @@ const articleSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        slug: { 
-            type: String, 
-            slug: "title", 
-            unique: true 
+        slug: {
+            type: String,
+            slug: "title",
+            unique: true,
         },
         timestamp: {
             type: Date,

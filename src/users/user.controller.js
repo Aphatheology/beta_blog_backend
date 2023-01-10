@@ -20,12 +20,19 @@ const createUser = catchAsync(async (req, res) => {
 });
 
 const getAllUsers = catchAsync(async (req, res) => {
+    const filter = pick(req.query, ["state", "author"]);
+    const options = pick(req.query, ["articles", "limit", "page"]);
     const user = await userService.getAllUsers(req.user);
     res.send(user);
 });
 
 const getUserByUsername = catchAsync(async (req, res) => {
     const user = await userService.getUserByUsername(req.params.username);
+    res.send(user);
+});
+
+const publicGetUserByUsername = catchAsync(async (req, res) => {
+    const user = await userService.publicGetUserByUsername(req.params.username);
     res.send(user);
 });
 
@@ -40,5 +47,6 @@ module.exports = {
     createUser,
     getAllUsers,
     getUserByUsername,
+    publicGetUserByUsername,
     updateUserByUsername,
 };

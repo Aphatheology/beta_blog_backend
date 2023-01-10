@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const moment = require("moment");
 const jwt = require("jsonwebtoken");
+const paginate = require("../utils/paginate");
 require("dotenv").config();
 
 const userSchema = new mongoose.Schema(
@@ -43,6 +44,8 @@ const userSchema = new mongoose.Schema(
     },
     { timeStamps: true }
 );
+
+userSchema.plugin(paginate);
 
 userSchema.pre("save", async function () {
     const salt = await bcrypt.genSalt(10);
