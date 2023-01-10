@@ -16,9 +16,20 @@ router
 
 router
     .route("/:slug")
-    .get(validate(articleValidation.getArticleBySlug), articleController.getArticleBySlug)
-    .patch(protect, validate(articleValidation.updateArticleBySlug), articleController.updateArticleBySlug)
-    .delete(protect, validate(articleValidation.deleteArticleBySlug), articleController.deleteArticle);
+    .get(
+        validate(articleValidation.getArticleBySlug),
+        articleController.getArticleBySlug
+    )
+    .patch(
+        protect,
+        validate(articleValidation.updateArticleBySlug),
+        articleController.updateArticleBySlug
+    )
+    .delete(
+        protect,
+        validate(articleValidation.deleteArticleBySlug),
+        articleController.deleteArticle
+    );
 
 router
     .route("/:slug/:state")

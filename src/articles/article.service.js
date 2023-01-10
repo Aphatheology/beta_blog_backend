@@ -10,9 +10,8 @@ const isTitleTaken = async function (title) {
 
 const calculateReadingTime = (lengthOfArticle) => {
     const wordsPerMinute = 180;
-    const minutes = lengthOfArticle / wordsPerMinute;
-    const readTime = Math.ceil(minutes);
-    return readTime;
+    const readingTime = Math.ceil(lengthOfArticle / wordsPerMinute);
+    return readingTime;
 };
 
 const getAllArticles = async (filter, options) => {
@@ -29,7 +28,6 @@ const createArticle = async (user, articleBody) => {
     const newArticle = {
         ...articleBody,
         author: user._id,
-        state: "draft",
         readingTime: calculateReadingTime(
             articleBody.body.match(/(\w+)/g).length
         ),
@@ -97,7 +95,7 @@ const updateArticleState = async (user, slug, state) => {
         throw new ApiError(httpStatus.NOT_FOUND, "Article not found");
     }
 
-    if (user.username !== article.author) {
+    if (user.username !== article.author && user.role !== "admin") {
         throw new ApiError(httpStatus.FORBIDDEN, "You are not authorized");
     }
 

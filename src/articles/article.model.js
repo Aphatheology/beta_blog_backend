@@ -9,9 +9,16 @@ const articleSchema = new mongoose.Schema(
             type: String,
             unique: true,
             required: true,
+            trim: true,
         },
-        description: {
+        body: {
             type: String,
+            required: true,
+        },
+        slug: {
+            type: String,
+            slug: "title",
+            unique: true,
         },
         author: {
             type: mongoose.Schema.Types.ObjectId,
@@ -34,14 +41,8 @@ const articleSchema = new mongoose.Schema(
         tags: {
             type: String,
         },
-        body: {
+        description: {
             type: String,
-            required: true,
-        },
-        slug: {
-            type: String,
-            slug: "title",
-            unique: true,
         },
         timestamp: {
             type: Date,
