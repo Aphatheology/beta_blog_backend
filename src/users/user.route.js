@@ -12,7 +12,7 @@ router
 
 router
   .route('/:username')
-  .get(validate(userValidation.getUser), userController.getUserByUsername)
+  .get(protect, validate(userValidation.getUser), userController.getUserByUsername)
   .patch(protect, validate(userValidation.updateUser), userController.updateUserByUsername);
 
   router

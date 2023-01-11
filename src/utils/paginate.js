@@ -24,8 +24,13 @@ const paginate = (schema) => {
                 : 1;
         const skip = (page - 1) * limit;
 
+        filter.state = filter.state ? filter.state : "published";
+
         const countPromise = this.countDocuments(filter).exec();
-        let docsPromise = this.find(filter).sort(sort).skip(skip).limit(limit);
+        let docsPromise = this.find(filter).populate({
+            path: 'author',
+            select: '-_id -password -role -__v'
+        }).sort(sort).skip(skip).limit(limit);
 
         if (options.populate) {
             console.log(options)

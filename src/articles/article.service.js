@@ -1,4 +1,5 @@
 const httpStatus = require("http-status");
+const logger = require("../config/logger");
 const userModel = require("../users/user.model");
 const ApiError = require("../utils/ApiError");
 const Articles = require("./article.model");
@@ -37,8 +38,8 @@ const createArticle = async (user, articleBody) => {
     
     const { _id } = article._doc;
 
-    const newUser = await userModel.findByIdAndUpdate(user._id, {$push: {articles: _id}})
-    console.log(newUser)
+    await userModel.findByIdAndUpdate(user._id, {$push: {articles: _id}});
+
     return article;
 };
 
@@ -59,19 +60,25 @@ const updateArticleReadCount = async (slug, article) => {
             readCount: ++article.readCount,
         },
         { returnDocument: "after" }
-    );
+    ).populate({
+        path: 'author',
+        select: '-_id -password -role -__v'
+    });
 
     return articleToUpdate;
 };
 
 const updateArticleBySlug = async (user, slug, articleBody) => {
-    let article = await Articles.findOne({ slug });
+    let article = await Articles.findOne({ slug }).populate({
+        path: 'author',
+        select: '-_id -password -role -__v'
+    });
 
     if (!article) {
         throw new ApiError(httpStatus.NOT_FOUND, "Article not found");
     }
 
-    if (user.username !== article.author) {
+    if (user.username !== article.author.username) {
         throw new ApiError(httpStatus.FORBIDDEN, "You are not authorized");
     }
 
@@ -90,13 +97,16 @@ const updateArticleBySlug = async (user, slug, articleBody) => {
 };
 
 const updateArticleState = async (user, slug, state) => {
-    let article = await Articles.findOne({ slug });
+    let article = await Articles.findOne({ slug }).populate({
+        path: 'author',
+        select: '-_id -password -role -__v'
+    });
 
     if (!article) {
         throw new ApiError(httpStatus.NOT_FOUND, "Article not found");
     }
 
-    if (user.username !== article.author && user.role !== "admin") {
+    if (user.username !== article.author.username && user.role !== "admin") {
         throw new ApiError(httpStatus.FORBIDDEN, "You are not authorized");
     }
 
@@ -110,13 +120,16 @@ const updateArticleState = async (user, slug, state) => {
 };
 
 const deleteArticle = async (user, slug) => {
-    const article = await Articles.findOne({ slug });
+    const article = await Articles.findOne({ slug }).populate({
+        path: 'author',
+        select: '-_id -password -role -__v'
+    });
 
     if (!article) {
         throw new ApiError(httpStatus.NOT_FOUND, "Article not found");
     }
 
-    if (user.username !== article.author && user.role !== "admin") {
+    if (user.username !== article.author.username && user.role !== "admin") {
         throw new ApiError(httpStatus.FORBIDDEN, "You are not authorized");
     }
 

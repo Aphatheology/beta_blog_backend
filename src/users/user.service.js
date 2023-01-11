@@ -72,13 +72,17 @@ const getAllUsers = async (user, filter, options) => {
     return users;
 };
 
-const getUserByUsername = async (username) => {
+const getUserByUsername = async (loggedinUser, username) => {
     const user = await Users.findOne({
         username: { $regex: username, $options: "i" },
     }).populate('articles');
 
     if (!user) {
         throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+    }
+
+    if (user.username !== loggedinUser.username) {
+        throw new ApiError(httpStatus.FORBIDDEN, "You are not authorized");
     }
 
     return user;

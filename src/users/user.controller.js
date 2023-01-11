@@ -25,7 +25,7 @@ const getAllUsers = catchAsync(async (req, res) => {
 });
 
 const getUserByUsername = catchAsync(async (req, res) => {
-    const user = await userService.getUserByUsername(req.params.username);
+    const user = await userService.getUserByUsername(req.user, req.params.username);
     res.send(user);
 });
 
