@@ -10,7 +10,6 @@ require('./src/config/passport');
 
 const app = express();
 
-//middleware
 if (config.env !== 'test') {
     app.use(morgan.successHandler);
     app.use(morgan.errorHandler);
