@@ -10,7 +10,7 @@ const envVarsSchema = Joi.object()
     PORT: Joi.string().default(3000),
     MONGO_URL: Joi.string().required(),
     JWT_SECRET: Joi.string().required(),
-    JWT_EXPIRES_IN_MINUTES: Joi.string().default(60).required(),
+    JWT_EXPIRES_IN_MINUTES: Joi.string().required(),
   })
   .unknown();
 

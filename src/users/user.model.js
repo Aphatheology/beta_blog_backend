@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const moment = require("moment");
 const jwt = require("jsonwebtoken");
+const config = require("../config/config");
 require("dotenv").config();
 
 const userSchema = new mongoose.Schema(
@@ -54,10 +55,10 @@ userSchema.methods.createJWT = function () {
         id: this._id,
         email: this.email,
         iat: moment().unix(),
-        exp: moment().add(process.env.JWT_EXPIRES_IN, "minutes").unix(),
+        exp: moment().add(config.jwt.expireInMinute, "minutes").unix(),
     };
 
-    return jwt.sign(payload, process.env.JWT_SECRET);
+    return jwt.sign(payload, config.jwt.secret);
 };
 
 userSchema.methods.correctPassword = async function (
