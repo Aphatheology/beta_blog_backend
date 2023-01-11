@@ -63,9 +63,9 @@ const createUser = async (user, userBody) => {
 };
 
 const getAllUsers = async (user, filter, options) => {
-    // if (user.role !== 'admin') {
-    // 	throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized');
-    // }
+    if (user.role !== 'admin') {
+    	throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized');
+    }
 
     const users = await Users.find();
 

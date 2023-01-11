@@ -8,7 +8,7 @@ const userValidation = require('./user.validation')
 router
   .route('/')
   .post(protect, validate(userValidation.createUser), userController.createUser)
-  .get( userController.getAllUsers);
+  .get(protect, userController.getAllUsers);
 
 router
   .route('/:username')
