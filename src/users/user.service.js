@@ -67,23 +67,25 @@ const getAllUsers = async (user, filter, options) => {
     // 	throw new ApiError(httpStatus.UNAUTHORIZED, 'Unauthorized');
     // }
 
-    const users = await Users.paginate(filter, options);
+    const users = await Users.find();
 
     return users;
 };
 
 const getUserByUsername = async (username) => {
-    const user = await Users.find({
+    const user = await Users.findOne({
         username: { $regex: username, $options: "i" },
     }).populate('articles');
-    if (user.length == 0) {
+
+    if (!user) {
         throw new ApiError(httpStatus.NOT_FOUND, "User not found");
     }
+
     return user;
 };
 
 const publicGetUserByUsername = async (username) => {
-    const user = await Users.find({
+    const user = await Users.findOne({
         username: { $regex: username, $options: "i" },
     })
         .select("-password")
@@ -92,19 +94,21 @@ const publicGetUserByUsername = async (username) => {
             path: "articles",
             match: { state: "published" },
         });
-    if (user.length == 0) {
+
+    if (!user) {
         throw new ApiError(httpStatus.NOT_FOUND, "User not found");
     }
+
     return user;
 };
 
 const updateUserByUsername = async (user, username, userBody) => {
-    console.log(user);
     let userToUpdate = await getUserByUsername(username);
-    console.log(userToUpdate);
+
     if (user.username !== userToUpdate[0].username) {
         throw new ApiError(httpStatus.FORBIDDEN, "You are not authorized");
     }
+    
     userToUpdate = await Users.findOneAndUpdate(
         { username: { $regex: username, $options: "i" } },
         userBody,

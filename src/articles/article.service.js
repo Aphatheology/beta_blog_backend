@@ -28,6 +28,7 @@ const createArticle = async (user, articleBody) => {
     const newArticle = {
         ...articleBody,
         author: user._id,
+        state: 'published',
         readingTime: calculateReadingTime(
             articleBody.body.match(/(\w+)/g).length
         ),

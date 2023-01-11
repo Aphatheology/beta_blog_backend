@@ -20,8 +20,6 @@ const createUser = catchAsync(async (req, res) => {
 });
 
 const getAllUsers = catchAsync(async (req, res) => {
-    const filter = pick(req.query, ["state", "author"]);
-    const options = pick(req.query, ["articles", "limit", "page"]);
     const user = await userService.getAllUsers(req.user);
     res.send(user);
 });
