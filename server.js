@@ -1,19 +1,18 @@
 require('dotenv').config();
 
 const app = require('./app');
+const config = require('./src/config/config');
+const logger = require('./src/config/logger');
 const connectDB = require('./src/db/connect');
 
-const port = process.env.PORT || 3030;
-
-
-const start = async () => {
+const startServer = async () => {
 	try {
-		await connectDB(process.env.MONGO_URL);
-		app.listen(port);
-        console.log("Db connected and app listening on port " + port)
+		await connectDB(config.mongoUrl);
+		app.listen(config.port);
+        logger.info(`Db connected and app listening on port ${config.port}`)
 	} catch (error) {
-		console.log(error);
+		logger.error(error);
 	}
 };
 
-start();
+startServer();

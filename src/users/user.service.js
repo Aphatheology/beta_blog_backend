@@ -12,39 +12,6 @@ const isUsernameTaken = async function (username) {
     return !!user;
 };
 
-const register = async (userBody) => {
-    if (await isEmailTaken(userBody.email)) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "Email already taken");
-    }
-
-    if (await isUsernameTaken(userBody.username)) {
-        throw new ApiError(httpStatus.BAD_REQUEST, "Username already taken");
-    }
-
-    const user = await Users.create(userBody);
-    const token = user.createJWT();
-    return { user, token };
-};
-
-const login = async (userBody) => {
-    const user = await Users.findOne({ email: userBody.email }).select(
-        "+password"
-    );
-
-    if (
-        !user ||
-        !(await user.correctPassword(userBody.password, user.password))
-    ) {
-        throw new ApiError(
-            httpStatus.UNAUTHORIZED,
-            "Incorrect email or password"
-        );
-    }
-    const token = user.createJWT();
-
-    return { user, token };
-};
-
 const createUser = async (user, userBody) => {
     if (user.role !== "admin") {
         throw new ApiError(httpStatus.UNAUTHORIZED, "Unauthorized");
@@ -123,8 +90,6 @@ const updateUserByUsername = async (user, username, userBody) => {
 };
 
 module.exports = {
-    register,
-    login,
     createUser,
     getAllUsers,
     getUserByUsername,

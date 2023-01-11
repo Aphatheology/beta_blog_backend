@@ -7,6 +7,10 @@ dotenv.config({ path: path.join(__dirname, '../../.env') });
 const envVarsSchema = Joi.object()
   .keys({
     NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
+    PORT: Joi.string().default(3000),
+    MONGO_URL: Joi.string().required(),
+    JWT_SECRET: Joi.string().required(),
+    JWT_EXPIRES_IN_MINUTES: Joi.string().default(60).required(),
   })
   .unknown();
 
@@ -17,5 +21,11 @@ if (error) {
 }
 
 module.exports = {
-  env: envVars.NODE_ENV
+  env: envVars.NODE_ENV,
+  port: envVars.PORT,
+  mongoUrl: envVars.MONGO_URL,
+  jwt: {
+    secret: envVars.JWT_SECRET,
+    expireInMinute: envVars.JWT_EXPIRES_IN_MINUTES,
+  }
 };
