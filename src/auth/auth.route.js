@@ -5,6 +5,7 @@ const authController = require('./auth.controller');
 const authValidation = require('./auth.validation')
 
 router.route('/register').post(validate(authValidation.register), authController.register);
+
 router.route('/login').post(validate(authValidation.login), authController.login);
 
 module.exports = router;

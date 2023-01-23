@@ -61,7 +61,7 @@ userSchema.methods.createJWT = function () {
     return jwt.sign(payload, config.jwt.secret);
 };
 
-userSchema.methods.correctPassword = async function (
+userSchema.methods.comparePassword = async function (
     candidatePassword,
     userPassword
 ) {

@@ -19,5 +19,3 @@ module.exports = {
   objectId,
   password,
 };
-
-// custom(objectId)

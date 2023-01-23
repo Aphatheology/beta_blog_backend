@@ -27,13 +27,11 @@ const register = async (userBody) => {
 };
 
 const login = async (userBody) => {
-    const user = await Users.findOne({ email: userBody.email }).select(
-        "+password"
-    );
+    const user = await Users.findOne({ email: userBody.email });
 
     if (
         !user ||
-        !(await user.correctPassword(userBody.password, user.password))
+        !(await user.comparePassword(userBody.password, user.password))
     ) {
         throw new ApiError(
             httpStatus.UNAUTHORIZED,

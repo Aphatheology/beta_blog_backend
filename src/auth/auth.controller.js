@@ -10,7 +10,7 @@ const register = catchAsync(async (req, res) => {
 
 const login = catchAsync(async (req, res) => {
     const user = await authService.login(req.body);
-    res.send(user);
+    res.status(httpStatus.OK).send(user);
 });
 
 
