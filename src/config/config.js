@@ -6,11 +6,10 @@ dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const envVarsSchema = Joi.object()
   .keys({
-    NODE_ENV: Joi.string().valid('production', 'development', 'test').required(),
-    PORT: Joi.string().default(3000),
     MONGO_URL: Joi.string().required(),
     JWT_SECRET: Joi.string().required(),
-    JWT_EXPIRES_IN_MINUTES: Joi.string().required(),
+    JWT_EXPIRES_IN_MINUTES: Joi.string().required(),NODE_ENV: Joi.string().valid('production', 'development').required(),
+    PORT: Joi.string().default(3000),
   })
   .unknown();
 

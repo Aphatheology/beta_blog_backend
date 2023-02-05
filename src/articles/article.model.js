@@ -44,13 +44,10 @@ const articleSchema = new mongoose.Schema(
         description: {
             type: String,
         },
-        timestamp: {
-            type: Date,
-            default: Date.now,
-        },
-    },
-    { timeStamps: true }
+    }
 );
+
+articleSchema.set("timestamps", true);
 
 articleSchema.plugin(paginate);
 
